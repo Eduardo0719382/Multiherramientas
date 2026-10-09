@@ -174,7 +174,7 @@ class ZoomVideoMaker(ttk.Frame):
         self.combo_export_mode.set(EXPORT_MODES[0])
         self.combo_export_mode.pack(fill=tk.X, pady=2)
 
-        self.btn_render = ttk.Button(ctrl, text="🎬 Iniciar Exportación", command=self.start_render)
+        self.btn_render = ttk.Button(ctrl, text="🎬 Iniciar Exportación", style="Accent.TButton", command=self.start_render)
         self.btn_render.pack(fill=tk.X, pady=4)
         self.progress = ttk.Progressbar(ctrl, mode="determinate")
         self.progress.pack(fill=tk.X, pady=2)
@@ -722,7 +722,7 @@ class VideoFrameExtractor(ttk.Frame):
         self.lbl_status.pack(fill="x")
 
         # 5. Botón de Ejecución
-        self.btn_run = ttk.Button(self, text="Iniciar Extracción", command=self._iniciar_hilo)
+        self.btn_run = ttk.Button(self, text="Iniciar Extracción", style="Accent.TButton", command=self._iniciar_hilo)
         self.btn_run.pack(pady=10)
 
     def _seleccionar_video(self):
@@ -866,7 +866,7 @@ class AudioSilencerApp(ttk.Frame):
         self.progress.pack(fill="x", padx=15, pady=5)
 
         # Botón de ejecución
-        self.btn_process = ttk.Button(self.root, text="Recortar y Guardar Como...", command=self.start_processing, state="disabled")
+        self.btn_process = ttk.Button(self.root, text="Recortar y Guardar Como...", style="Accent.TButton", command=self.start_processing, state="disabled")
         self.btn_process.pack(fill="x", padx=15, pady=15)
 
     def select_file(self):
@@ -989,7 +989,7 @@ class TextSplitterApp(ttk.Frame):
         self.spin_limite.set(13)
         self.spin_limite.pack(side="left", padx=(0, 15))
 
-        btn_procesar = ttk.Button(ctrl_frame, text="Dividir Subtítulos", command=self.procesar_texto)
+        btn_procesar = ttk.Button(ctrl_frame, text="Dividir Subtítulos", style="Accent.TButton", command=self.procesar_texto)
         btn_procesar.pack(side="left", padx=(0, 5))
 
         btn_limpiar = ttk.Button(ctrl_frame, text="Limpiar", command=self.limpiar)
@@ -1257,7 +1257,7 @@ class VideoBlurFill(ttk.Frame):
 
         btns = ttk.Frame(self)
         btns.pack(pady=10)
-        self.btn_run = ttk.Button(btns, text="Convertir a 16:9", command=self._iniciar)
+        self.btn_run = ttk.Button(btns, text="Convertir a 16:9", style="Accent.TButton", command=self._iniciar)
         self.btn_run.pack(side="left", padx=5)
         self.btn_cancel = ttk.Button(btns, text="Cancelar", command=self._cancelar, state="disabled")
         self.btn_cancel.pack(side="left", padx=5)
@@ -1569,7 +1569,10 @@ class HerramientasMultimedia(TkinterDnD.Tk):
         super().__init__()
         self.title(f"Herramientas Multimedia v{__version__}")
         self.cfg = cargar_config()
-        sv_ttk.set_theme(self.cfg.get("tema", "dark"))
+        sv_ttk.set_theme(self.cfg.get("tema", "light"))
+        ttk.Style().configure("TNotebook.Tab", padding=(8, 8), font=("Segoe UI", 9, "bold"))
+        ttk.Style().configure("Accent.TButton", font=("Segoe UI", 10, "bold"))
+        self.option_add("*Font", ("Segoe UI", 10))
         self.geometry("1340x880")
         self.minsize(700, 600)
 
@@ -1590,12 +1593,12 @@ class HerramientasMultimedia(TkinterDnD.Tk):
         notebook.pack(fill="both", expand=True)
 
         pestanas = [
-            (" Zoom de imágenes ", ZoomVideoMaker),
-            (" Video vertical a 16:9 ", VideoBlurFill),
-            (" Extractor de fotogramas ", VideoFrameExtractor),
-            (" Recortar silencios ", AudioSilencerApp),
-            (" Subtítulos Canva ", TextSplitterApp),
-            (" Convertidor universal ", UniversalConverter),
+            (" 🔍  Zoom de imágenes ", ZoomVideoMaker),
+            (" 📱 Video vertical a 16:9 ", VideoBlurFill),
+            (" 🎞 Extractor de fotogramas ", VideoFrameExtractor),
+            (" ✂ Recortar silencios ", AudioSilencerApp),
+            (" 💬 Subtítulos Canva ", TextSplitterApp),
+            (" 🔄 Convertidor universal ", UniversalConverter),
         ]
         for titulo, clase in pestanas:
             notebook.add(clase(notebook), text=titulo)

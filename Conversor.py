@@ -493,7 +493,7 @@ class UniversalConverter(ttk.Frame):
 
         acciones = ttk.Frame(top)
         acciones.pack(fill=tk.X)
-        self.btn_ir = ttk.Button(acciones, text="🔄 Convertir", command=self.iniciar)
+        self.btn_ir = ttk.Button(acciones, text="🔄 Convertir", style="Accent.TButton", command=self.iniciar)
         self.btn_ir.pack(side=tk.LEFT)
         self.btn_cancel = ttk.Button(acciones, text="Cancelar", command=self.cancelar, state=tk.DISABLED)
         self.btn_cancel.pack(side=tk.LEFT, padx=6)
