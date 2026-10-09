@@ -28,6 +28,7 @@ from pydub.silence import detect_nonsilent
 
 from Conversor import UniversalConverter, colores_tema
 import Actualizador
+from Divisor import SplitterTab
 import sv_ttk
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
@@ -1599,6 +1600,7 @@ class HerramientasMultimedia(TkinterDnD.Tk):
             (" ✂ Recortar silencios ", AudioSilencerApp),
             (" 💬 Subtítulos Canva ", TextSplitterApp),
             (" 🔄 Convertidor universal ", UniversalConverter),
+            (" ✂ Dividir archivos ", SplitterTab),
         ]
         for titulo, clase in pestanas:
             notebook.add(clase(notebook), text=titulo)
