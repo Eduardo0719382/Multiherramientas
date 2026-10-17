@@ -5,6 +5,7 @@ y se sincroniza con la rama principal del repositorio. Para publicar una actuali
 con hacer push a esa rama: no hace falta recompilar el .exe (salvo que se agregue una librería).
 """
 import io
+import re
 import json
 import os
 import shutil
@@ -52,13 +53,31 @@ def sha_remoto(timeout=8):
 
 
 def preparar(carpeta_incluida):
-    """Primera ejecución: copia el código incluido en el .exe a APP_DIR."""
-    if os.path.exists(os.path.join(APP_DIR, MAIN_FILE)):
+    """Instala también una versión incluida más nueva que la caché existente."""
+    local = os.path.join(APP_DIR, MAIN_FILE)
+    incluida = os.path.join(carpeta_incluida, MAIN_FILE)
+    if os.path.exists(local) and version_archivo(local) >= version_archivo(incluida):
         return
     os.makedirs(APP_DIR, exist_ok=True)
     for n in os.listdir(carpeta_incluida):
         if n.endswith(".py"):
             shutil.copy2(os.path.join(carpeta_incluida, n), os.path.join(APP_DIR, n))
+    _guardar_estado({"sha": ""})
+
+
+def version_codigo(src):
+    if isinstance(src, bytes):
+        src = src.decode("utf-8-sig")
+    match = re.search(r'^__version__\s*=\s*[\'"](\d+)\.(\d+)\.(\d+)[\'"]', src, re.MULTILINE)
+    return tuple(map(int, match.groups())) if match else (0, 0, 0)
+
+
+def version_archivo(path):
+    try:
+        with open(path, encoding="utf-8-sig") as f:
+            return version_codigo(f.read())
+    except OSError:
+        return (0, 0, 0)
 
 
 def actualizar(timeout=8):
@@ -82,6 +101,8 @@ def actualizar(timeout=8):
                 nuevos[partes[1]] = z.read(info)
     if MAIN_FILE not in nuevos:
         raise RuntimeError(f"El repositorio no contiene {MAIN_FILE} en la raíz.")
+    if version_codigo(nuevos[MAIN_FILE]) < version_archivo(os.path.join(APP_DIR, MAIN_FILE)):
+        return False  # No sustituir las mejoras incluidas por una publicación antigua.
     for nombre, src in nuevos.items():          # comprobar que compila antes de reemplazar nada
         compile(src, nombre, "exec")
     os.makedirs(APP_DIR, exist_ok=True)
@@ -106,7 +127,7 @@ def comprobar(root, silencioso=False):
             cambio = actualizar()
         except Exception as e:
             if not silencioso:
-                root.after(0, lambda: messagebox.showerror("Actualizaciones", f"No se pudo actualizar:\n{e}"))
+                root.after(0, lambda error=str(e): messagebox.showerror("Actualizaciones", f"No se pudo actualizar:\n{error}"))
             return
         if not cambio:
             if not silencioso:

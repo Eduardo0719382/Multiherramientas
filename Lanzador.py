@@ -18,7 +18,7 @@ def _carpeta_incluida():
 
 
 def _crear_app(carpeta):
-    for m in ("HerramientasMultimedia", "Conversor"):
+    for m in ("HerramientasMultimedia", "Conversor", "Divisor", "Rafaga", "CamaraAudio"):
         sys.modules.pop(m, None)
     sys.path.insert(0, carpeta)
     try:
@@ -30,6 +30,17 @@ def _crear_app(carpeta):
 
 def main():
     incluida = _carpeta_incluida()
+    if len(sys.argv) == 3 and sys.argv[1] == "--comprobar-inicio":
+        import json
+        app = _crear_app(incluida)
+        app.withdraw()
+        app.update_idletasks()
+        tab = app.nametowidget(app.notebook.tabs()[0])
+        with open(sys.argv[2], "w", encoding="utf-8") as f:
+            json.dump({"titulo": app.title(), "pestanas": len(app.notebook.tabs()),
+                       "rafaga": type(tab).__name__, "perspectiva": tab.settings()["perspective"]}, f)
+        app.destroy()
+        return
     errores = []
     try:
         Actualizador.preparar(incluida)

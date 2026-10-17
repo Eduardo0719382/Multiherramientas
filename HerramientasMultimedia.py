@@ -29,10 +29,11 @@ from pydub.silence import detect_nonsilent
 from Conversor import UniversalConverter, colores_tema
 import Actualizador
 from Divisor import SplitterTab
+from Rafaga import RafagaTab
 import sv_ttk
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 
 CONFIG_PATH = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")),
                            "HerramientasMultimedia", "config.json")
@@ -1594,6 +1595,7 @@ class HerramientasMultimedia(TkinterDnD.Tk):
         notebook.pack(fill="both", expand=True)
 
         pestanas = [
+            (" 📸 Ráfaga de fotos ", RafagaTab),
             (" 🔍  Zoom de imágenes ", ZoomVideoMaker),
             (" 📱 Video vertical a 16:9 ", VideoBlurFill),
             (" 🎞 Extractor de fotogramas ", VideoFrameExtractor),
