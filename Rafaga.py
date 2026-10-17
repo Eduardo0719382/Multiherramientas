@@ -48,6 +48,12 @@ def validate(settings, duration, count):
         raise ValueError("La ráfaga no cabe en el video. Reduce inicio, intervalo o permanencia.")
     if not 10 <= settings["size"] <= 100 or not 0 <= settings["volume"] <= 200:
         raise ValueError("Tamaño: 10–100 %. Volumen: 0–200 %.")
+    if settings.get("zoom", True):
+        intensity = settings.get("zoom_intensity", 6)
+        if not math.isfinite(intensity) or not 0 <= intensity <= 100:
+            raise ValueError("La intensidad del zoom debe estar entre 0 y 100 %.")
+        if settings.get("zoom_direction", "in") not in ("in", "out"):
+            raise ValueError("Selecciona Zoom in o Zoom out.")
 
 
 def prepare_photos(paths, width, height, settings):
@@ -176,12 +182,16 @@ def compose(frame, time, photos, settings):
         for photo, position in visible:
             canvas.paste(photo, position, photo)
     if settings.get("zoom", True):
-        # Acercamiento del conjunto durante las entradas, con frenado suave.
+        # Movimiento del conjunto durante las entradas, con frenado suave.
         # Se conserva la escala final mientras permanece el collage.
         duration = max(.45, (len(photos) - 1) * settings["interval"])
         progress = min(1.0, relative / duration)
         progress = progress * progress * (3 - 2 * progress)
-        factor = 1 + .06 * progress
+        intensity = settings.get("zoom_intensity", 6) / 100
+        motion = 1 - progress if settings.get("zoom_direction", "in") == "out" else progress
+        # Zoom out parte acercado y termina en el encuadre completo,
+        # sin reducir el collage por debajo del tamaño del video.
+        factor = 1 + intensity * motion
         w, h = canvas.size
         dx, dy = w * (1 - 1 / factor) / 2, h * (1 - 1 / factor) / 2
         canvas = canvas.transform((w, h), Image.Transform.EXTENT,
@@ -295,6 +305,8 @@ class RafagaTab(ttk.Frame):
         self.flash = tk.BooleanVar(value=False)
         self.perspective = tk.BooleanVar(value=True)
         self.zoom = tk.BooleanVar(value=True)
+        self.zoom_direction = tk.StringVar(value="Zoom in (acercar)")
+        self.zoom_intensity = tk.StringVar(value="6")
         left = ttk.Frame(self)
         left.pack(side="left", fill="y", padx=(0, 16))
         right = ttk.Frame(self)
@@ -319,7 +331,15 @@ class RafagaTab(ttk.Frame):
         ttk.Combobox(left, textvariable=self.values["mode"], values=["Collage acumulado", "Una por una"], state="readonly").pack(fill="x", pady=5)
         ttk.Checkbutton(left, text="Conservar audio del video", variable=self.keep_audio).pack(anchor="w")
         ttk.Checkbutton(left, text="Perspectiva 3D del collage", variable=self.perspective).pack(anchor="w")
-        ttk.Checkbutton(left, text="Zoom de entrada suave", variable=self.zoom).pack(anchor="w")
+        ttk.Checkbutton(left, text="Activar zoom", variable=self.zoom, command=self.toggle_zoom_controls).pack(anchor="w")
+        zoom_row = ttk.Frame(left)
+        zoom_row.pack(fill="x", pady=3)
+        self.zoom_combo = ttk.Combobox(zoom_row, textvariable=self.zoom_direction,
+                                      values=["Zoom in (acercar)", "Zoom out (alejar)"], state="readonly", width=19)
+        self.zoom_combo.pack(side="left")
+        ttk.Label(zoom_row, text=" Intensidad % ").pack(side="left")
+        self.zoom_spin = ttk.Spinbox(zoom_row, textvariable=self.zoom_intensity, from_=0, to=100, increment=1, width=5)
+        self.zoom_spin.pack(side="right")
         ttk.Checkbutton(left, text="Destello al aparecer cada foto", variable=self.flash).pack(anchor="w")
         self.export_button = ttk.Button(left, text="Exportar MP4…", command=self.start_export, style="Accent.TButton")
         self.export_button.pack(fill="x", pady=8)
@@ -377,9 +397,15 @@ class RafagaTab(ttk.Frame):
             del self.paths[i]
         self.refresh_list()
 
+    def toggle_zoom_controls(self):
+        self.zoom_combo.configure(state="readonly" if self.zoom.get() else "disabled")
+        self.zoom_spin.configure(state="normal" if self.zoom.get() else "disabled")
+
     def settings(self):
         result = {k: (v.get() if k == "mode" else parse_tiempo(v.get())) for k, v in self.values.items()}
         result.update(keep_audio=self.keep_audio.get(), flash=self.flash.get(), perspective=self.perspective.get(), zoom=self.zoom.get())
+        result["zoom_direction"] = "out" if self.zoom_direction.get() == "Zoom out (alejar)" else "in"
+        result["zoom_intensity"] = float(self.zoom_intensity.get().replace(",", ".")) if self.zoom.get() else 0
         return result
 
     def show_preview(self):

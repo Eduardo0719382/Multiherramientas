@@ -1,6 +1,6 @@
 # Ráfaga de fotos
 
-Abre `dist/HerramientasMultimedia.exe` (versión 1.2.0) para usar las mejoras. Al iniciar instala el código incluido si la copia guardada es anterior. También puedes ejecutar el código con `Abrir herramientas.bat`.
+Abre `dist/HerramientasMultimedia.exe` (versión 1.3.0) para usar las mejoras. Al iniciar instala el código incluido si la copia guardada es anterior. También puedes ejecutar el código con `Abrir herramientas.bat`.
 
 1. En la pestaña **Ráfaga de fotos**, elige el video de fondo.
 2. Añade imágenes y ordénalas con las flechas. También puedes arrastrar archivos a la pestaña.
@@ -25,3 +25,5 @@ Los bordes se calculan a 4 veces la resolución y se reducen con suavizado. Las 
 La casilla **Perspectiva 3D del collage** activa o desactiva el efecto. El ejecutable comprueba actualizaciones en el repositorio configurado, pero no instala versiones inferiores a la que ya tienes. Para actualizar otras copias antiguas mediante Internet hay que publicar los archivos Python en ese repositorio; recompilar el ejecutable solo actualiza esta copia local.
 
 **Zoom de entrada suave** viene activado: al empezar la ráfaga, acerca progresivamente el conjunto un 6 % y mantiene el acercamiento hasta que termina el efecto. Puede desactivarse. El acercamiento recorta ligeramente los bordes externos del encuadre.
+
+En **Activar zoom** puedes habilitar o quitar el efecto. Elige **Zoom in (acercar)** o **Zoom out (alejar)** y una **Intensidad de 0 a 100 %** (6 % por defecto; 0 % no cambia la escala). Zoom out empieza acercado y vuelve al encuadre completo, sin crear bordes vacíos. Estos controles se aplican a la vista previa y al MP4.

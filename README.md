@@ -18,3 +18,6 @@ Consulta [RAFAGA.md](RAFAGA.md). Los archivos `Rafaga.py`, `CamaraAudio.py` y `D
 se distribuyen junto al programa mediante el actualizador. El audio está integrado en Python.
 
 Pruebas: `python -m unittest discover -s tests -v`.
+
+### v1.3.0
+Zoom configurable: activar/desactivar, Zoom in o Zoom out e intensidad de 0 a 100 %.

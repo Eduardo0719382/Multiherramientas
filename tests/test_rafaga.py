@@ -38,6 +38,16 @@ class BurstTest(unittest.TestCase):
   self.assertFalse(np.array_equal(compose(background,1.3,photos,settings),compose(background,1.3,photos,dict(settings,zoom=False))))
   np.testing.assert_array_equal(compose(background,1.5,photos,settings),compose(background,2.5,photos,settings))
   np.testing.assert_array_equal(compose(background,3,photos,settings),background)
+  no_zoom=compose(background,1.5,photos,dict(settings,zoom=False))
+  np.testing.assert_array_equal(compose(background,1.5,photos,dict(settings,zoom_intensity=0)),no_zoom)
+  near=compose(background,1.5,photos,dict(settings,zoom_intensity=50))
+  self.assertFalse(np.array_equal(near,compose(background,1.5,photos,settings)))
+  np.testing.assert_array_equal(near,compose(background,1,photos,dict(settings,zoom_direction='out',zoom_intensity=50)))
+  np.testing.assert_array_equal(no_zoom,compose(background,1.5,photos,dict(settings,zoom_direction='out',zoom_intensity=50)))
+  for invalid in [-1,101,float('nan'),float('inf')]:
+   with self.assertRaises(ValueError):
+    validate(dict(settings,size=100,volume=100,zoom_intensity=invalid),5,1)
+
 
  def test_export_and_timing(self):
   with tempfile.TemporaryDirectory(dir='.') as tmp:

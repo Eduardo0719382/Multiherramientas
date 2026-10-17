@@ -33,7 +33,7 @@ from Rafaga import RafagaTab
 import sv_ttk
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 CONFIG_PATH = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")),
                            "HerramientasMultimedia", "config.json")
